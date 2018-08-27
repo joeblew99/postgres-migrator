@@ -1,8 +1,8 @@
-# Contributing to Cariam projects
-Cariam is a simple project, internal project based on .NET WPF user interface.
+# Contributing to Postgres Migrator project
+
+This is a simple project development in bash shell script
 
 ---
-
 
 ## Code guidelines
 

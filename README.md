@@ -1,18 +1,6 @@
 # EDP Database service
 
-This repoitory contains the migration, patches and deploy scripts for [EDPDP](https://forge.edpauto.it/stock/datastore/edpdb.git) EDP database support.
-
-EDP Database documentation
-------------
-
-
-Build Status
-------------
-
-|Staging |Release |Stable |
-|:------:|:------:|:------:|
-|
-[![build status](https://forge.edpauto.it/cariam/cariam.api/badges/master/build.svg)](https://forge.edpauto.it/cariam/cariam.api/pipelines)|[![build status](https://forge.edpauto.it/cariam/cariam.api/badges/release/0.6.0/build.svg)](https://forge.edpauto.it/cariam/cariam.api/pipelines)|[![build status](https://forge.edpauto.it/cariam/cariam.api/badges/release/0.5.0/build.svg)](https://forge.edpauto.it/cariam/cariam.api/pipelines)|
+This repoitory contains the migration, patches and deploy scripts for [EDPDP](https://github.com/silentnull/postgres-migrator) EDP database support.
 
 
 Installers and Binaries
@@ -39,10 +27,6 @@ Questions & Comments
 
 For any and all feedback, please use the Issues on this repository. 
 
-Changelog
--------------------
-
-Document with changes is availabled as Whats News in Cariam API services or on [website](https://forge.edpauto.it/stock/datastore/edpdb/blob/master/CHANGELOG.md).
 
 Authors
 -------------------
@@ -53,6 +37,6 @@ Authors
 License
 -------------------
 
-By downloading the text file document you are agreeing to the terms in the project [EULA](https://forge.edpauto.it/stock/datastore/edpdb/blob/master/LICENSE).
+By downloading the text file document you are agreeing to the terms in the project [EULA](https://raw.githubusercontent.com/silentnull/postgres-migrator/master/LICENSE).
 
 
