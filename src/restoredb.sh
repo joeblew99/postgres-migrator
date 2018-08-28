@@ -44,6 +44,7 @@ function usage {
     echo " -w \"Prompt password (Yes, otherwise is no prompts)\""
     echo " -c \"Cluster name\""
     echo " -d \"Database name\""
+    echo " -t \"Database template\""
     echo
     echo "Define dump using file and bucket names:"
     echo " -O \"Only restore database without download dump image\""
@@ -57,7 +58,7 @@ function usage {
     echo "Otherwise, define message using standard input."
     echo
     echo "Example:  restoredb [-n <arg1> -o <arg2> -m <arg3> -b <arg4> -e <arg5> -a <arg6> -k <arg7> "
-    echo "                  -h <arg8> -u <arg9> -w <arg10> -c <arg11> -d <arg12>]"
+    echo "                  -h <arg8> -u <arg9> -w <arg10> -c <arg11> -d <arg12> -t <arg13>]"
     echo
 }
 
@@ -69,7 +70,7 @@ fi
 
 
 # parse arguments
-while getopts "n:o:m:b:e:a:k:h:u:w:c:d:O:F:T:L:v" option; do
+while getopts "n:o:m:b:e:a:k:h:u:w:c:d:t:O:F:T:L:v" option; do
     case $option in
         "n")
         environment=${OPTARG}
@@ -107,6 +108,9 @@ while getopts "n:o:m:b:e:a:k:h:u:w:c:d:O:F:T:L:v" option; do
         "d")
         pg_database=${OPTARG}
         ;;
+	"t")
+	pg_template=${OPTARG}
+	;;
         "O")
         only_restore=${OPTARG}
         ;;
@@ -148,6 +152,10 @@ fi
 
 if [ -z "$pg_database" ]; then
     pg_database=${pg_cluster}
+fi
+
+if [ -z "$pg_template" ]; then
+   pg_template="template4"
 fi
 
 log_app="Restore PostgreSQL database from bucket: [${s3_bucket}]@[${s3_endpoint}], to database: [${pg_database}].[${pg_cluster}]@${pg_host}."
@@ -247,7 +255,7 @@ if [ $? != 0 ]; then
 fi
 
 # Restore database
-restore_database ${pg_host} ${pg_user} ${pg_database} "${PG_DUMPFILE}" 
+restore_database ${pg_host} ${pg_user} ${pg_database} "${PG_DUMPFILE}" ${pg_template}
 if [ $? != 0 ]; then
     logger -a "${log_app}" -p "${log_provider}" -l "ERROR" -m "ERROR on restore  ${pg_database} database instance on ${pg_host} host." -v
     exit 1
