@@ -57,8 +57,8 @@ alter_foreign_servers() {
 		if [[ ${ENV} == "development" ]]; then
 		    if [[ ${ENV_TEAM} == "dotnet" ]]; then
 				sudo psql -v ON_ERROR_STOP=1 --username "${PG_USER}" -h ${PG_SERVER} -d ${PG_DATABASE} <<-EOSQL
-					ALTER SERVER transactions OPTIONS (SET host 'db.transactions.dev.dacsoftware.it');
-					ALTER SERVER transactionscluster OPTIONS (SET p0 'dbname=transactions host=db.transactions.dev.dacsoftware.it port=5432');
+					ALTER SERVER transactions OPTIONS (SET host 'pgdba.transactions.dev.dacsoftware.it');
+					ALTER SERVER transactionscluster OPTIONS (SET p0 'dbname=transactions host=pgdba.transactions.dev.dacsoftware.it port=5432');
 				EOSQL
 		    else
 				sudo psql -v ON_ERROR_STOP=1 --username "${PG_USER}" -h ${PG_SERVER} -d ${PG_DATABASE} <<-EOSQL
@@ -102,8 +102,8 @@ alter_foreign_servers() {
 		if [[ ${ENV} == "development" ]]; then
 		    if [[ ${ENV_TEAM} == "dotnet" ]]; then
 				sudo psql -v ON_ERROR_STOP=1 --username "${PG_USER}" -h ${PG_SERVER} -d ${PG_DATABASE} <<-EOSQL
-					ALTER SERVER edp OPTIONS (SET host 'db.stock.dev.dacsoftware.it');
-					ALTER SERVER enterprisecluster OPTIONS (SET p0 'dbname=edp host=db.stock.dev.dacsoftware.it port=5432');
+					ALTER SERVER edp OPTIONS (SET host 'pgdba.stock.dev.dacsoftware.it');
+					ALTER SERVER enterprisecluster OPTIONS (SET p0 'dbname=edp host=pgdba.stock.dev.dacsoftware.it port=5432');
 				EOSQL
 				exit 0
 		    else
