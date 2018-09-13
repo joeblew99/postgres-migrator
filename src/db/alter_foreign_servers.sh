@@ -57,19 +57,20 @@ alter_foreign_servers() {
 		if [[ ${ENV} == "development" ]]; then
 		    if [[ ${ENV_TEAM} == "dotnet" ]]; then
 				sudo psql -v ON_ERROR_STOP=1 --username "${PG_USER}" -h ${PG_SERVER} -d ${PG_DATABASE} <<-EOSQL
-					ALTER SERVER transactions OPTIONS (SET host 'pgdba.transactions.dev.dacsoftware.it');
-					ALTER SERVER transactionscluster OPTIONS (SET p0 'dbname=transactions host=pgdba.transactions.dev.dacsoftware.it port=5432');
+					ALTER SERVER transactions OPTIONS (SET host 'db.poz.transactions.dev.dacsoftware.it');
+					ALTER SERVER transactionscluster OPTIONS (SET p0 'dbname=transactions host=db.poz.transactions.dev.dacsoftware.it port=5432');
 				EOSQL
 		    else
 				sudo psql -v ON_ERROR_STOP=1 --username "${PG_USER}" -h ${PG_SERVER} -d ${PG_DATABASE} <<-EOSQL
-					ALTER SERVER transactions OPTIONS (SET host 'db.transactions.dev.edpauto.tech');
-					ALTER SERVER transactionscluster OPTIONS (SET p0 'dbname=transactions host=db.transactions.dev.edpauto.tech port=5432');
+					ALTER SERVER transactions OPTIONS (SET host 'db.poz.transactions.dev.edpauto.tech');
+					ALTER SERVER transactionscluster OPTIONS (SET p0 'dbname=transactions host=db.poz.transactions.dev.edpauto.tech port=5432');
 				EOSQL
 		    fi
 			sudo psql -v ON_ERROR_STOP=1 --username "${PG_USER}" -h ${PG_SERVER} -d ${PG_DATABASE} <<-EOSQL
 				DROP SERVER IF EXISTS "edpauto.fr" CASCADE;
 				DROP SERVER IF EXISTS "qarson.fr" CASCADE;
 				DROP SERVER IF EXISTS "qarson.pl" CASCADE;
+				DROP SERVER IF EXISTS "cariam" CASCADE;
 			EOSQL
 			exit 0
 		fi
@@ -79,6 +80,7 @@ alter_foreign_servers() {
 			DROP SERVER IF EXISTS "edpauto.fr" CASCADE;
 			DROP SERVER IF EXISTS "qarson.fr" CASCADE;
 			DROP SERVER IF EXISTS "qarson.pl" CASCADE;
+			DROP SERVER IF EXISTS "cariam" CASCADE;
 		EOSQL
 	fi
 
@@ -102,8 +104,8 @@ alter_foreign_servers() {
 		if [[ ${ENV} == "development" ]]; then
 		    if [[ ${ENV_TEAM} == "dotnet" ]]; then
 				sudo psql -v ON_ERROR_STOP=1 --username "${PG_USER}" -h ${PG_SERVER} -d ${PG_DATABASE} <<-EOSQL
-					ALTER SERVER edp OPTIONS (SET host 'pgdba.stock.dev.dacsoftware.it');
-					ALTER SERVER enterprisecluster OPTIONS (SET p0 'dbname=edp host=pgdba.stock.dev.dacsoftware.it port=5432');
+					ALTER SERVER edp OPTIONS (SET host 'db.poz.stock.dev.dacsoftware.it');
+					ALTER SERVER enterprisecluster OPTIONS (SET p0 'dbname=edp host=db.poz.stock.dev.dacsoftware.it port=5432');
 				EOSQL
 				exit 0
 		    else

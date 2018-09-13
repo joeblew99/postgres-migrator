@@ -35,6 +35,7 @@ function usage {
     echo
     echo "PostgreSQL database using parameters:"  
     echo " -h \"Host name\""
+    echo " -r \"Host Url\""
     echo " -u \"Username\""
     echo " -w \"Prompt password (Yes, otherwise is no prompts)\""
     echo " -c \"Cluster name\""
@@ -62,7 +63,7 @@ if [ "$#" = "0" ];then
 fi
 
 # parse arguments
-while getopts "n:o:m:b:e:a:k:h:u:w:c:d:F:T:L:v" option; do
+while getopts "n:o:m:b:e:a:k:h:r:u:w:c:d:F:T:L:v" option; do
     case $option in
         "n")
         environment=${OPTARG}
@@ -87,6 +88,9 @@ while getopts "n:o:m:b:e:a:k:h:u:w:c:d:F:T:L:v" option; do
         ;;
         "h")
         pg_host=${OPTARG}
+        ;;
+        "r")
+        pg_url=${OPTARG}
         ;;
         "u")
         pg_user=${OPTARG}
@@ -127,6 +131,10 @@ if [ -z "$pg_host" ]; then
     pg_host="localhost"
 fi
 
+if [ -z "$pg_url" ]; then
+    pg_url=${pg_host}
+fi
+
 if [ -z "$pg_port" ]; then
     pg_port="5432"
 fi
@@ -140,7 +148,8 @@ if [ -z "$pg_database" ]; then
 fi
 
 dump_time=`date +%Y%m%d-%H%M`
-log_app="Dump PostgreSQL database: [${pg_database}].[${pg_cluster}]@${pg_host}, to bucket: [${s3_bucket}]@[${s3_endpoint}] "
+#log_app="Dump PostgreSQL database: [${pg_database}].[${pg_cluster}]@${pg_host}, to bucket: [${s3_bucket}]@[${s3_endpoint}] "
+log_app="Dump PostgreSQL database: ${pg_database}."
 
 # verify basic parameters
 if [ -z "$environment" ]; then
@@ -211,13 +220,19 @@ fi
 # # Dump database roles
 dump_roles ${pg_host} ${pg_user} ${pg_database} "${bucket_path}/roles/${environment}" "db_roles.sql"
 
+log_pg_url=${pg_database}@${pg_url}
+
+log_s3_url=${s3_endpoint#"https://"}
+log_s3_url="https://"${s3_bucket}.${log_s3_url}
+
+
 # Handle error
 if [ $? != 0 ]; then
-    logger -a "${log_app}" -p "${log_provider}" -l "ERROR" -m "Error during backup PostgreSQL database:  [${pg_database}/${pg_cluster}].${pg_host}, on bucket: [${s3_space}].${s3_endpoint}."
+    logger -a "${log_app}" -p "slack" -l "ERROR" -m "Error during backup PostgreSQL database: ${log_pg_url}, to S3 bucket: ${log_s3_url}."
     exit 2
 fi
 
-logger -a "${log_app}" -p "${log_provider}" -l "NOTICE" -m "Successful backup PostgreSQL database: [${pg_database}/${pg_cluster}].${pg_host}, on bucket: [${s3_space}].${s3_endpoint}."
+logger -a "${log_app}" -p "slack" -l "NOTICE" -m "Successful backup PostgreSQL database:  ${log_pg_url}, to S3 bucket: ${log_s3_url}."
 
 cd ${pwd}
 exit 0

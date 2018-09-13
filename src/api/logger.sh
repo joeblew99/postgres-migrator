@@ -86,8 +86,8 @@ logger() {
 
     # log to Slack
     if [[ "${provider^^}" == *"SLACK"* ]]; then
-        local slack_url="https://hooks.slack.com/services/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"
-        local slack_channel=postgres
+        local slack_url="https://hooks.slack.com/services/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"
+        local slack_channel=alerta
         local slack_user="Postgres Migrator"
         local slack_icon="postgres"
 
@@ -102,7 +102,7 @@ logger() {
             local slack_message="Send a new warning message: ${message}"
             slack -h "${slack_url}" -c ${slack_channel} -u "${slack_user}" -i ${slack_icon} -C F9CD04 -T "${slack_title}" -m "${slack_message}"
         fi
-        
+
         if [ "${level^^}" == "NOTICE" ]; then
             local slack_title="A new message source: ${apps}." 
             local slack_message="Send a new notice message: ${message}"
