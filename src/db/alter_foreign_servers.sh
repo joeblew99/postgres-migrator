@@ -58,12 +58,12 @@ alter_foreign_servers() {
 		    if [[ ${ENV_TEAM} == "dotnet" ]]; then
 				sudo psql -v ON_ERROR_STOP=1 --username "${PG_USER}" -h ${PG_SERVER} -d ${PG_DATABASE} <<-EOSQL
 					ALTER SERVER transactions OPTIONS (SET host 'db.poz.transactions.dev.dacsoftware.it');
-					ALTER SERVER transactionscluster OPTIONS (SET p0 'dbname=transactions host=db.poz.transactions.dev.dacsoftware.it port=5432');
+					ALTER SERVER transactionscluster OPTIONS (SET p0 'dbname=transactions host=db.transactions.dev.dacsoftware.it port=5432');
 				EOSQL
 		    else
 				sudo psql -v ON_ERROR_STOP=1 --username "${PG_USER}" -h ${PG_SERVER} -d ${PG_DATABASE} <<-EOSQL
-					ALTER SERVER transactions OPTIONS (SET host 'db.poz.transactions.dev.edpauto.tech');
-					ALTER SERVER transactionscluster OPTIONS (SET p0 'dbname=transactions host=db.poz.transactions.dev.edpauto.tech port=5432');
+					ALTER SERVER transactions OPTIONS (SET host 'db.transactions.dev.edpauto.tech');
+					ALTER SERVER transactionscluster OPTIONS (SET p0 'dbname=transactions host=db.transactions.dev.edpauto.tech port=5432');
 				EOSQL
 		    fi
 			sudo psql -v ON_ERROR_STOP=1 --username "${PG_USER}" -h ${PG_SERVER} -d ${PG_DATABASE} <<-EOSQL
@@ -84,7 +84,7 @@ alter_foreign_servers() {
 		EOSQL
 	fi
 
-	if [[ ${PG_DATABASE} == "transactions" ]]; then		
+	if [[ ${PG_DATABASE} == "transactions" ]]; then
 		if [[ ${ENV} == "production" ]]; then
 			sudo psql -v ON_ERROR_STOP=1 --username "${PG_USER}" -h ${PG_SERVER} -d ${PG_DATABASE} <<-EOSQL
 				ALTER SERVER edp OPTIONS (SET host 'db.stock.prod.edpauto.tech');

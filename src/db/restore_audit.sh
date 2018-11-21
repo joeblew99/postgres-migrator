@@ -23,6 +23,11 @@ restore_audit() {
 		exit 1
 	fi
 
-	sudo psql ${PG_DATABASE} < db/scripts/pg_audit.sql -v ON_ERROR_STOP=1 -h ${PG_SERVER} -U ${PG_USER}
+	if [[ ${PG_DATABASE} != "transactions" ]]; then
+		if [ ${PG_DATABASE} != "edp" ]; then
+			exit 1
+		fi
+	fi
 
+	sudo psql ${PG_DATABASE} < db/scripts/pg_audit.sql -v ON_ERROR_STOP=1 -h ${PG_SERVER} -U ${PG_USER}
 }

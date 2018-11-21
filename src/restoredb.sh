@@ -5,7 +5,7 @@
 set -e
 
 # # define the boundaries after which the message will be sent will be sent as an attachment
-# # count "c" characters or "l" lines from stdin 
+# # count "c" characters or "l" lines from stdin
 # stdin_check="l"
 # # define number of characters or lines from stdin
 # stdin_count="2"
@@ -22,6 +22,7 @@ source db/restore_audit.sh
 source db/alter_foreign_servers.sh
 source db/ampq_brokers.sh
 source db/replace_contact_mail.sh
+source db/create_pgcron_extension.sh
 
 # define usage function
 function usage {
@@ -38,7 +39,7 @@ function usage {
     echo " -a \"Access key\""
     echo " -k \"Secret key\""
     echo
-    echo "PostgreSQL database using parameters:"  
+    echo "PostgreSQL database using parameters:"
     echo " -h \"Host name\""
     echo " -u \"Username\""
     echo " -w \"Prompt password (Yes, otherwise is no prompts)\""
@@ -108,9 +109,9 @@ while getopts "n:o:m:b:e:a:k:h:u:w:c:d:t:O:F:T:L:v" option; do
         "d")
         pg_database=${OPTARG}
         ;;
-	"t")
-	pg_template=${OPTARG}
-	;;
+	    "t")
+	    pg_template=${OPTARG}
+	    ;;
         "O")
         only_restore=${OPTARG}
         ;;
@@ -209,9 +210,9 @@ PG_HOME=/etc/postgresql/${PG_VERSION}/main
 PG_VERSION=postgres_version
 
 # check and remove dump files and directories
-if [ -x ${PG_BACKUP_DIR} ]; then 
+if [ -x ${PG_BACKUP_DIR} ]; then
     rm -f ${PG_BACKUP_DIR}/*.zip
-else 
+else
     logger -a "${log_app}" -p "${log_provider}" -l "ERROR" -m "Local backup folder doesn't exist."
     exit 1
 fi
@@ -234,13 +235,13 @@ if [ -z ${only_restore} ]; then
         downloader -b "${bucket_path}/dumps" -p "${PG_BACKUP_DIR}" -d ${pg_database} -f "${dump_file}" -A ${log_app} -L ${log_provider}
     fi;
 else
-	if [[ -z ${dump_file} ]]; then    		
+	if [[ -z ${dump_file} ]]; then
 		FILES=()
-		for i in $(ls ${PG_BACKUP_DIR}); 
-			do  
+		for i in $(ls ${PG_BACKUP_DIR});
+			do
     			if [[ ${i} == "${pg_database}"*".dumpfile"* ]]; then
 			 		FILES+=(${i})
-			 	fi;	
+			 	fi;
 		done;
 
 		SORTED_FILES=($(sort <<<"${FILES[*]}"))
@@ -275,6 +276,7 @@ if [ $? != 0 ]; then
     exit 1
 fi
 
+# set AMPQ broker
 ampq_brokers ${environment} ${pg_host} ${pg_user} ${pg_database}
 if [ $? != 0 ]; then
     logger -a "${log_app}" -p "${log_provider}" -l "ERROR" -m "ERROR on replace AMPQ brokers endpoints on ${pg_database} database instance on ${pg_host} host." -v

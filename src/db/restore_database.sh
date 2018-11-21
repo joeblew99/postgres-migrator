@@ -60,7 +60,6 @@ restore_database() {
     			TABLESPACE = pg_default
     			CONNECTION LIMIT = -1;
 	EOSQL
-
 	sudo psql -v ON_ERROR_STOP=1 --username ${PG_USER} -h ${PG_SERVER} -d ${PG_DATABASE} <<-EOSQL
         GRANT CONNECT, TEMPORARY ON DATABASE ${PG_DATABASE} TO public;
         GRANT ALL ON DATABASE ${PG_DATABASE} TO postgres;
@@ -70,7 +69,11 @@ restore_database() {
 		grant_priviledges ${PG_SERVER} ${PG_USER} ${PG_DATABASE}
 	fi
 
-	echo "Restore database: ${PG_DATABASE} on host: ${PG_SERVER}."	
+	if [[ ${PG_DATABASE} == "pgcrontab" ]]; then
+		create_pgcron_extension ${PG_SERVER} ${PG_DATABASE} ${PG_USER}
+	fi
+
+	echo "Restore database: ${PG_DATABASE} on host: ${PG_SERVER}."
 	sudo psql ${PG_DATABASE} <  ${PG_DUMPFILE} -h ${PG_SERVER} -U ${PG_USER}
 	sudo psql -v ON_ERROR_STOP=1 --username ${PG_USER} -h ${PG_SERVER} -d ${PG_DATABASE} <<-EOSQL
         VACUUM FULL ANALYZE;
