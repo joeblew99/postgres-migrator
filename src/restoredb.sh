@@ -250,52 +250,55 @@ else
 		PG_DUMPFILE=${dump_file}
 	fi;
 fi
+
 if [ $? != 0 ]; then
-    logger -a "${log_app}" -p "${log_provider}" -l "ERROR" -m "ERROR on during download dump of ${pg_database} database from bucket: ${bucket_path} ." -v
+    logger -a "${log_app}" -p "slack" -l "ERROR" -m "ERROR on during download dump of ${pg_database} database from bucket: ${bucket_path} ." -v
     exit 1
 fi
 
 # Unschedule pgcron jobs
 unschedule_pgcron_jobs ${pg_host} ${pg_database} ${pg_user}
 if [ $? != 0 ]; then
-    logger -a "${log_app}" -p "${log_provider}" -l "ERROR" -m "ERROR during unschedule pgcron jobs on ${pg_database} database instance on ${pg_host} host." -v
+    logger -a "${log_app}" -p "slack" -l "ERROR" -m "ERROR during unschedule pgcron jobs on ${pg_database} database instance on ${pg_host} host." -v
     exit 1
 fi
 
 # Restore database
 restore_database ${pg_host} ${pg_user} ${pg_database} "${PG_DUMPFILE}" ${pg_template}
 if [ $? != 0 ]; then
-    logger -a "${log_app}" -p "${log_provider}" -l "ERROR" -m "ERROR on restore  ${pg_database} database instance on ${pg_host} host." -v
+    logger -a "${log_app}" -p "slack" -l "ERROR" -m "ERROR on restore  ${pg_database} database instance on ${pg_host} host." -v
     exit 1
 fi
 
 # Apply required changes on database after migration
 restore_audit ${pg_host} ${pg_user} ${pg_database}
 if [ $? != 0 ]; then
-    logger -a "${log_app}" -p "${log_provider}" -l "ERROR" -m "ERROR on restore audit tables on ${pg_database} database instance on ${pg_host} host." -v
+    logger -a "${log_app}" -p "slack" -l "ERROR" -m "ERROR on restore audit tables on ${pg_database} database instance on ${pg_host} host." -v
     exit 1
 fi
 
 # set foreign servers
 alter_foreign_servers ${environment} ${team} ${pg_host} ${pg_user} ${pg_database}
 if [ $? != 0 ]; then
-    logger -a "${log_app}" -p "${log_provider}" -l "ERROR" -m "ERROR on alter foreign servers on ${pg_database} database instance on ${pg_host} host." -v
+    logger -a "${log_app}" -p "slack" -l "ERROR" -m "ERROR on alter foreign servers on ${pg_database} database instance on ${pg_host} host." -v
     exit 1
 fi
 
 # set AMPQ broker
 ampq_brokers ${environment} ${pg_host} ${pg_user} ${pg_database}
 if [ $? != 0 ]; then
-    logger -a "${log_app}" -p "${log_provider}" -l "ERROR" -m "ERROR on replace AMPQ brokers endpoints on ${pg_database} database instance on ${pg_host} host." -v
+    logger -a "${log_app}" -p "slack" -l "ERROR" -m "ERROR on replace AMPQ brokers endpoints on ${pg_database} database instance on ${pg_host} host." -v
     exit 1
 fi
 
 # replace contact mail
 replace_contact_mail ${environment} ${pg_host} ${pg_user} ${pg_database}
 if [ $? != 0 ]; then
-    logger -a "${log_app}" -p "${log_provider}" -l "ERROR" -m "ERROR on replace contact mails on ${pg_database} database instance on ${pg_host} host." -v
+    logger -a "${log_app}" -p "slack" -l "ERROR" -m "ERROR on replace contact mails on ${pg_database} database instance on ${pg_host} host." -v
     exit 1
 fi
+
+logger -a "${log_app}" -p "slack" -l "NOTICE" -m "Successful restore PostgreSQL database: ${pg_database}-${pg_cluster}-${environment}, from S3 bucket: ${log_s3_url}."
 
 cd ${pwd}
 exit 0
