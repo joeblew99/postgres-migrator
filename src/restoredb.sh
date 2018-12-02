@@ -255,6 +255,13 @@ if [ $? != 0 ]; then
     exit 1
 fi
 
+# Unschedule pgcron jobs
+unschedule_pgcron_jobs ${pg_host} ${pg_database} ${pg_user}
+if [ $? != 0 ]; then
+    logger -a "${log_app}" -p "${log_provider}" -l "ERROR" -m "ERROR during unschedule pgcron jobs on ${pg_database} database instance on ${pg_host} host." -v
+    exit 1
+fi
+
 # Restore database
 restore_database ${pg_host} ${pg_user} ${pg_database} "${PG_DUMPFILE}" ${pg_template}
 if [ $? != 0 ]; then

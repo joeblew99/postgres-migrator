@@ -30,27 +30,9 @@ ampq_brokers() {
 	fi
 
 	if [[ ${PG_DATABASE} == "transactions" ]]; then
-
-		if [[ ${ENV} == "production" ]]; then
-			sudo psql -v ON_ERROR_STOP=1 -h ${PG_SERVER} -U ${PG_USER} -d ${PG_DATABASE} <<-EOSQL
-                INSERT INTO amqp.broker (broker_id, host, port, vhost, username, password) VALUES (1, 'pub-rabbit.docker.qarson.tech', 5672, 'access', 'access', 'z878SnreUNgjy5UH'); 
-			EOSQL
-			exit 0
-		fi
-
-		if [[ ${ENV} == "staging" ]]; then
-			sudo psql -v ON_ERROR_STOP=1 -h ${PG_SERVER} -U ${PG_USER} -d ${PG_DATABASE} <<-EOSQL
-	        	INSERT INTO amqp.broker (broker_id, host, port, vhost, username, password) VALUES (1, 'rc.edp', 5672, 'access', 'access', '5JrSK#-3');
-			EOSQL
-			exit 0
-		fi
-
-		if [[ ${ENV} == "development" ]]; then
-			sudo psql -v ON_ERROR_STOP=1 -h ${PG_SERVER} -U ${PG_USER} -d ${PG_DATABASE} <<-EOSQL
-		        INSERT INTO amqp.broker (broker_id, host, port, vhost, username, password) VALUES (1, 'w.edp', 5672, 'access', 'access', '5JrSK#-3');
-			EOSQL
-			exit 0
-		fi
+		sudo psql -v ON_ERROR_STOP=1 -h ${PG_SERVER} -U ${PG_USER} -d ${PG_DATABASE} <<-EOSQL
+			PERFORM access_api.set_broker();
+		EOSQL
 	fi
 
 	exit 0
