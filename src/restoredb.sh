@@ -71,7 +71,7 @@ fi
 
 
 # parse arguments
-while getopts "n:o:m:b:e:a:k:h:u:w:c:d:t:O:F:T:L:v" option; do
+while getopts "n:o:m:b:e:a:k:h:u:w:c:d:t:O:F:T:L:S:v" option; do
     case $option in
         "n")
         environment=${OPTARG}
@@ -107,11 +107,11 @@ while getopts "n:o:m:b:e:a:k:h:u:w:c:d:t:O:F:T:L:v" option; do
         pg_cluster=${OPTARG}
         ;;
         "d")
-        pg_database=${OPTARG}
+        pg_db=${OPTARG}
         ;;
-	    "t")
-	    pg_template=${OPTARG}
-	    ;;
+	"t")
+	pg_template=${OPTARG}
+	;;
         "O")
         only_restore=${OPTARG}
         ;;
@@ -123,6 +123,9 @@ while getopts "n:o:m:b:e:a:k:h:u:w:c:d:t:O:F:T:L:v" option; do
         ;;
         "L")
         log_provider=${OPTARG}
+	;;
+	"S")
+	test_instance=${OPTARG}
         ;;
         "v")
         log_verbose=" -v"
@@ -151,8 +154,8 @@ if [ -z "$pg_user" ]; then
     pg_user="postgres"
 fi
 
-if [ -z "$pg_database" ]; then
-    pg_database=${pg_cluster}
+if [ -z "$pg_db" ]; then
+    pg_db=${pg_cluster}
 fi
 
 if [ -z "$pg_template" ]; then
@@ -226,22 +229,22 @@ if [ -z ${only_restore} ]; then
     minio -h ${s3_server} -e ${s3_endpoint} -a ${s3_access} -k ${s3_secret} -A ${log_app} -L ${log_provider}
     cwd=$(pwd)
 
-	# remove old dump files
-	rm -f ${PG_BACKUP_DIR}/${pg_database}_*
+    # remove old dump files 
+    rm -f ${PG_BACKUP_DIR}/${pg_db}_*
 
     if [ -z ${dump_file} ]; then
-        downloader -b "${bucket_path}/dumps" -p "${PG_BACKUP_DIR}" -d ${pg_database} -A ${log_app} -L ${log_provider}
+        downloader -b "${bucket_path}/dumps" -p "${PG_BACKUP_DIR}" -d ${pg_db} -A ${log_app} -L ${log_provider}
     else
-        downloader -b "${bucket_path}/dumps" -p "${PG_BACKUP_DIR}" -d ${pg_database} -f "${dump_file}" -A ${log_app} -L ${log_provider}
+        downloader -b "${bucket_path}/dumps" -p "${PG_BACKUP_DIR}" -d ${pg_db} -f "${dump_file}" -A ${log_app} -L ${log_provider}
     fi;
 else
 	if [[ -z ${dump_file} ]]; then
 		FILES=()
 		for i in $(ls ${PG_BACKUP_DIR});
 			do
-    			if [[ ${i} == "${pg_database}"*".dumpfile"* ]]; then
-			 		FILES+=(${i})
-			 	fi;
+    			if [[ ${i} == "${pg_db}"*".dumpfile"* ]]; then
+				FILES+=(${i})
+			fi;
 		done;
 
 		SORTED_FILES=($(sort <<<"${FILES[*]}"))
@@ -251,13 +254,19 @@ else
 	fi;
 fi
 
+if  [ -z ${test_instance} ]; then
+    pg_database=${pg_db}
+else
+    pg_database="${pg_db}_test_2"
+fi
+
 if [ $? != 0 ]; then
     logger -a "${log_app}" -p "slack" -l "ERROR" -m "ERROR on during download dump of ${pg_database} database from bucket: ${bucket_path} ." -v
     exit 1
 fi
 
 # Unschedule pgcron jobs
-unschedule_pgcron_jobs ${pg_host} ${pg_database} ${pg_user}
+#unschedule_pgcron_jobs ${pg_host} ${pg_database} ${pg_user}
 if [ $? != 0 ]; then
     logger -a "${log_app}" -p "slack" -l "ERROR" -m "ERROR during unschedule pgcron jobs on ${pg_database} database instance on ${pg_host} host." -v
     exit 1

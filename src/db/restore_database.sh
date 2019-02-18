@@ -38,11 +38,11 @@ restore_database() {
 	fi
 
 	# Restore database
-	echo "Kill all connections to: ${PG_DATABASE} on host: ${PG_SERVER}."
-	sudo psql -v ON_ERROR_STOP=1 --username ${PG_USER} -h ${PG_SERVER} -d postgres <<-EOSQL
-	        SELECT pg_terminate_backend(pg_stat_activity.pid)
-	        FROM pg_stat_activity WHERE pg_stat_activity.datname = '${PG_DATABASE}';
-	EOSQL
+#	echo "Kill all connections to: ${PG_DATABASE} on host: ${PG_SERVER}."
+#	sudo psql -v ON_ERROR_STOP=1 --username ${PG_USER} -h ${PG_SERVER} -d postgres <<-EOSQL
+#	        SELECT pg_terminate_backend(pg_stat_activity.pid)
+#	        FROM pg_stat_activity WHERE pg_stat_activity.datname = '${PG_DATABASE}';
+#	EOSQL
 
 	echo "Drop database: ${PG_DATABASE} on host: ${PG_SERVER}."
 	sudo psql -v ON_ERROR_STOP=1 --username ${PG_USER} -h ${PG_SERVER} -d postgres <<-EOSQL
