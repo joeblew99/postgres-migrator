@@ -247,7 +247,7 @@ else
 		SORTED_FILES=($(sort <<<"${FILES[*]}"))
 		PG_DUMPFILE=${PG_BACKUP_DIR}/${SORTED_FILES[-1]}
 	else
-		PG_DUMPFILE=${dump_file}
+		PG_DUMPFILE=${PG_BACKUP_DIR}/${dump_file}
 	fi;
 fi
 
@@ -257,11 +257,11 @@ if [ $? != 0 ]; then
 fi
 
 # Unschedule pgcron jobs
-unschedule_pgcron_jobs ${pg_host} ${pg_database} ${pg_user}
-if [ $? != 0 ]; then
-    logger -a "${log_app}" -p "slack" -l "ERROR" -m "ERROR during unschedule pgcron jobs on ${pg_database} database instance on ${pg_host} host." -v
-    exit 1
-fi
+# unschedule_pgcron_jobs ${pg_host} ${pg_database} ${pg_user}
+# if [ $? != 0 ]; then
+#     logger -a "${log_app}" -p "slack" -l "ERROR" -m "ERROR during unschedule pgcron jobs on ${pg_database} database instance on ${pg_host} host." -v
+#     exit 1
+# fi
 
 # Restore database
 restore_database ${pg_host} ${pg_user} ${pg_database} "${PG_DUMPFILE}" ${pg_template}
