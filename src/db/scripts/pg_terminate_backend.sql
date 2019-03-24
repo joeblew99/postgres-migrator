@@ -2,7 +2,7 @@
 -- Description  : Terminate connections to PostgreSQL database
 -- Authors      : Pawel Kasperek
 --                  Copyright 2017 by DAC Software
--- Comment      : Patch for restrore EDP databases 
+-- Comment      : Patch for restrore EDP databases
 --*************************************************************************************************
 
 SET search_path=public,pg_catalog;
@@ -26,7 +26,7 @@ BEGIN
 	IF (is_current_backend) THEN
 		PERFORM pg_terminate_backend((SELECT p.pid FROM pg_stat_activity p WHERE p.pid = pg_backend_pid() LIMIT 1)::integer);
 	END IF;
-	
+
 	RETURN;
 END;
 $BODY$

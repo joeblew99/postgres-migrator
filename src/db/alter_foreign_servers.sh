@@ -36,7 +36,6 @@ alter_foreign_servers() {
 	fi
 
 	if [[ ${PG_DATABASE} == "edp" ]]; then
-
 		if [[ ${ENV} == "production" ]]; then
 			sudo psql -v ON_ERROR_STOP=1 --username "${PG_USER}" -h ${PG_SERVER} -d ${PG_DATABASE} <<-EOSQL
 				ALTER SERVER transactions OPTIONS (SET host 'db.transactions.prod.edpauto.tech');
@@ -48,40 +47,22 @@ alter_foreign_servers() {
 			sudo psql -v ON_ERROR_STOP=1 --username "${PG_USER}" -h ${PG_SERVER} -d ${PG_DATABASE} <<-EOSQL
 				ALTER SERVER transactions OPTIONS (SET host 'db.transactions.stg.edpauto.tech');
 				ALTER SERVER transactionscluster OPTIONS (SET p0 'dbname=transactions host=db.transactions.stg.edpauto.tech port=5432');
-				ALTER SERVER "qarson.fr" OPTIONS (SET host 'qarson.fr.rc.edp');
-				ALTER SERVER "qarson.pl" OPTIONS (SET host 'qarson.pl.rc.edp');
-				ALTER SERVER "edpauto.fr" OPTIONS (SET host 'edpauto.fr.rc.edp');
+				ALTER SERVER "qarson.fr" OPTIONS (SET host '10.0.0.222');
+				ALTER SERVER "edpauto.fr" OPTIONS (SET host '10.0.0.222');
+				ALTER SERVER cariam OPTIONS (SET host 'pgdba.cariam.stg.dacsoftware.it');
 			EOSQL
 			exit 0
 		fi
 		if [[ ${ENV} == "development" ]]; then
-		    if [[ ${ENV_TEAM} == "dotnet" ]]; then
-				sudo psql -v ON_ERROR_STOP=1 --username "${PG_USER}" -h ${PG_SERVER} -d ${PG_DATABASE} <<-EOSQL
-					ALTER SERVER transactions OPTIONS (SET host 'db.poz.transactions.dev.dacsoftware.it');
-					ALTER SERVER transactionscluster OPTIONS (SET p0 'dbname=transactions host=db.transactions.dev.dacsoftware.it port=5432');
-				EOSQL
-		    else
-				sudo psql -v ON_ERROR_STOP=1 --username "${PG_USER}" -h ${PG_SERVER} -d ${PG_DATABASE} <<-EOSQL
-					ALTER SERVER transactions OPTIONS (SET host 'db.transactions.dev.edpauto.tech');
-					ALTER SERVER transactionscluster OPTIONS (SET p0 'dbname=transactions host=db.transactions.dev.edpauto.tech port=5432');
-				EOSQL
-		    fi
 			sudo psql -v ON_ERROR_STOP=1 --username "${PG_USER}" -h ${PG_SERVER} -d ${PG_DATABASE} <<-EOSQL
-				DROP SERVER IF EXISTS "edpauto.fr" CASCADE;
-				DROP SERVER IF EXISTS "qarson.fr" CASCADE;
-				DROP SERVER IF EXISTS "qarson.pl" CASCADE;
-				DROP SERVER IF EXISTS "cariam" CASCADE;
+				ALTER SERVER transactions OPTIONS (SET host 'db.transactions.dev.edpauto.tech');
+				ALTER SERVER transactionscluster OPTIONS (SET p0 'dbname=transactions host=db.transactions.dev.edpauto.tech port=5432');
+				ALTER SERVER "qarson.fr" OPTIONS (SET host '10.0.0.222');
+				ALTER SERVER "edpauto.fr" OPTIONS (SET host '10.0.0.222');
+				ALTER SERVER cariam OPTIONS (SET host 'pgdba.cariam.stg.dacsoftware.it');
 			EOSQL
 			exit 0
 		fi
-		sudo psql -v ON_ERROR_STOP=1 --username "${PG_USER}" -h ${PG_SERVER} -d ${PG_DATABASE} <<-EOSQL
-			DROP SERVER IF EXISTS "transactions" CASCADE;
-			DROP SERVER IF EXISTS "transactionscluster" CASCADE;
-			DROP SERVER IF EXISTS "edpauto.fr" CASCADE;
-			DROP SERVER IF EXISTS "qarson.fr" CASCADE;
-			DROP SERVER IF EXISTS "qarson.pl" CASCADE;
-			DROP SERVER IF EXISTS "cariam" CASCADE;
-		EOSQL
 	fi
 
 	if [[ ${PG_DATABASE} == "transactions" ]]; then
