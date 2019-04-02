@@ -37,6 +37,9 @@ restore_database() {
 		local PG_TEMPLATE=$5
 	fi
 
+	# Remove old WAL log files
+	# find /var/lib/postgresql/10/main/pg_wal/* -mtime +2 -exec rm {} \;
+
 	# Restore database
 	echo "Kill all connections to: ${PG_DATABASE} on host: ${PG_SERVER}."
 	sudo psql -v ON_ERROR_STOP=1 --username ${PG_USER} -h ${PG_SERVER} -d postgres <<-EOSQL
